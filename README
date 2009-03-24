@@ -1,6 +1,6 @@
 Env::Export - Export environment variables as constant subroutines
 
-Version: 0.10
+Version: 0.11
 
 WHAT IS IT
 
@@ -60,8 +60,4 @@ up for all CPAN-based distributions:
 CHANGES
 
 * lib/Env/Export.pm
-* t/00_load.t
-* t/01_pod.t
-* t/02_pod_coverage.t
-* t/10_basic.t
-Initial draft of the very basic functionality.                  
+Fixed typo in the documentation.                                

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-use 5.006;
+use 5.006001;
 use strict;
 use warnings;
 
@@ -36,14 +36,13 @@ my $builder =
                 dist_author        => 'Randy J. Ray <rjray@blackperl.com>',
                 dist_abstract      =>
                 'Automatically export environment variables as constant-subs',
-                dist_version       => '0.10',
+                dist_version       => '0.11',
                 build_requires     => {
                                        'Module::Build' => '0.28',
                                        'Test::More'    => '0.80',
                                       },
                 requires           => {
-                                       'perl'                      => '5.006',
-                                       'File::Spec'                => '0.8',
+                                       'perl' => '5.006001',
                                       },
                 recommends         => {
                                        'Test::Pod'           => '0',
