@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- :tabSize=2:indentSize=2:wrap=hard: -->
+<changelog xmlns="http://www.blackperl.com/2009/01/ChangeLogML"
+    xmlns:sc="http://www.blackperl.com/2009/01/ChangeLogML/source-control"
+    xmlns:git="http://www.blackperl.com/2009/01/ChangeLogML/source-control/git"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xsi:schemaLocation="http://www.blackperl.com/XML/ChangeLog etc/ChangeLogML.xsd">
+  <project>Env::Export</project>
+  <title>Perl Module Env::Export Change History</title>
+  <description>
+    A Perl module to facilitate exporting environment values as run-time
+    constant subroutines.
+  </description>
+  <release version="0.10" sc:tag="0.10" date="2009-03-24T03:45:00-07:00">
+    <change git:commit="c5fef0302ba06a669eb41b6eb31c52333ca6cea8">
+      <fileset>
+        <file path="lib/Env/Export.pm" />
+        <file path="t/00_load.t" />
+        <file path="t/01_pod.t" />
+        <file path="t/02_pod_coverage.t" />
+        <file path="t/10_basic.t" />
+      </fileset>
+      <description>
+        Initial draft of the very basic functionality.
+      </description>
+    </change>
+  </release>
+</changelog>
