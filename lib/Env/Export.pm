@@ -8,7 +8,7 @@
 #
 ###############################################################################
 #
-#   Description:    
+#   Description:    Export environment variables as constant subs
 #
 #   Functions:      import
 #
@@ -27,7 +27,7 @@ use subs qw(import);
 
 use Carp qw(carp croak);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 ###############################################################################
 #
@@ -84,11 +84,11 @@ __END__
 
 =head1 NAME
 
-Env::Constant - Export %ENV values as constant subroutines
+Env::Export - Export %ENV values as constant subroutines
 
 =head1 SYNOPSIS
 
-    use Env::Constant qr/^PAR/;
+    use Env::Export qr/^PAR/;
 
     # This will fail at compile time if the $ENV{PAR_PROGNAME}
     # environment variable didn't exist:
