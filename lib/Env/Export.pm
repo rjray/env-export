@@ -27,7 +27,7 @@ use subs qw(import);
 
 use Carp qw(carp croak);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 ###############################################################################
 #
@@ -49,31 +49,42 @@ our $VERSION = '0.11';
 sub import
 {
     my ($class, @patterns) = @_;
+    my $me = "${class}::import";
+
+    no strict 'refs';
 
     return unless @patterns; # Nothing to do if they didn't request anything
 
+    my $nowarn = (grep($_ eq ':nowarn', @patterns)) ? 1 : 0;
     my @bad_pats = grep(! /^[A-Za-z_]\w*$/, @patterns);
     if (@bad_pats)
     {
-        carp "${class}::import: Removing patterns not legal for identifiers: "
-            . "@bad_pats";
+        carp "$me: Removing patterns not legal for identifiers: @bad_pats"
+            unless $nowarn;
         @patterns = grep(! /\W/, @patterns);
     }
 
     for (@patterns) { $_ = qr/^$_$/ unless (ref($_) eq 'RegExp') }
 
     my ($calling_pkg) = caller();
-    croak("Could not determine caller package")
+    croak("$me: Could not determine caller package")
         if not defined $calling_pkg or $calling_pkg eq '';
+    my $callersym = \%{"${calling_pkg}::"};
 
     foreach my $envkey (keys %ENV)
     {
         next unless ($envkey =~ /^[A-Za-z_]\w*$/);
         next unless grep($envkey =~ $_, @patterns);
 
+        if (exists($callersym->{$envkey}) && defined(&{$callersym->{$envkey}}))
+        {
+            # We don't overwrite existing subroutines
+            carp "$me: Will not redefine ${calling_pkg}::$envkey, skipping"
+                unless $nowarn;
+            next;
+        }
         my $varname = "${calling_pkg}::$envkey";
         my $value = $ENV{$envkey};
-        no strict 'refs';
         *$varname = sub () { $value };
     }
 }
