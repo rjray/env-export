@@ -12,6 +12,25 @@
     A Perl module to facilitate exporting environment values as run-time
     constant subroutines.
   </description>
+  <release version="0.12" sc:tag="0.12" date="2009-03-24T17:25:00-07:00">
+    <change git:commit="c8fa9c279917cd77e4f6aec4fbd24f844f2491db">
+      <fileset>
+        <file path="lib/Env/Export.pm" />
+        <file path="t/15_no_redefine.t" action="ADD" />
+      </fileset>
+      <description>
+        Check before creating a sub, to avoid clobbering existing subs.
+      </description>
+    </change>
+    <change git:commit="9a57a7bbdc5bd5f53918acd20df5ca2f03b352d8">
+      <file path="lib/Env/Export.pm" />
+      <description>
+        Fix for
+        <xhtml:a href="http://rt.cpan.org/Ticket/Display.html?id=44539">RT
+        ticket #44539</xhtml:a>, typo in the name of a class.
+      </description>
+    </change>
+  </release>
   <release version="0.11" sc:tag="0.11" date="2009-03-24T04:30:00-07:00">
     <change git:commit="c37f1474e4f0f0289417fb99cfd689a4faf36b3c">
       <file path="lib/Env/Export.pm" />
@@ -23,11 +42,11 @@
   <release version="0.10" sc:tag="0.10" date="2009-03-24T03:45:00-07:00">
     <change git:commit="c5fef0302ba06a669eb41b6eb31c52333ca6cea8">
       <fileset>
-        <file path="lib/Env/Export.pm" />
-        <file path="t/00_load.t" />
-        <file path="t/01_pod.t" />
-        <file path="t/02_pod_coverage.t" />
-        <file path="t/10_basic.t" />
+        <file path="lib/Env/Export.pm" action="ADD" />
+        <file path="t/00_load.t" action="ADD" />
+        <file path="t/01_pod.t" action="ADD" />
+        <file path="t/02_pod_coverage.t" action="ADD" />
+        <file path="t/10_basic.t" action="ADD" />
       </fileset>
       <description>
         Initial draft of the very basic functionality.

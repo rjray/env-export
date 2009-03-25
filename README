@@ -1,6 +1,6 @@
 Env::Export - Export environment variables as constant subroutines
 
-Version: 0.11
+Version: 0.12
 
 WHAT IS IT
 
@@ -60,4 +60,8 @@ up for all CPAN-based distributions:
 CHANGES
 
 * lib/Env/Export.pm
-Fixed typo in the documentation.                                
+* t/15_no_redefine.t (added)
+Check before creating a sub, to avoid clobbering existing subs.
+
+* lib/Env/Export.pm
+Fix for RT ticket #44539, typo in the name of a class.

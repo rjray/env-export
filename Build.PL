@@ -36,7 +36,7 @@ my $builder =
                 dist_author        => 'Randy J. Ray <rjray@blackperl.com>',
                 dist_abstract      =>
                 'Automatically export environment variables as constant-subs',
-                dist_version       => '0.11',
+                dist_version       => '0.12',
                 build_requires     => {
                                        'Module::Build' => '0.28',
                                        'Test::More'    => '0.80',
