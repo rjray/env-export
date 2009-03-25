@@ -64,7 +64,7 @@ sub import
         @patterns = grep(! /\W/, @patterns);
     }
 
-    for (@patterns) { $_ = qr/^$_$/ unless (ref($_) eq 'RegExp') }
+    for (@patterns) { $_ = qr/^$_$/ unless (ref($_) eq 'Regexp') }
 
     my ($calling_pkg) = caller();
     croak("$me: Could not determine caller package")
