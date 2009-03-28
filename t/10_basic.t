@@ -6,7 +6,7 @@ use vars qw($TEMPLATE $instance @all_env);
 
 use Test::More;
 
-@all_env = sort grep(/^\w+$/, keys %ENV);
+@all_env = sort grep(/^[A-Za-z_]\w*$/, keys %ENV);
 
 plan tests => scalar @all_env;
 
@@ -19,9 +19,8 @@ END_TEMPLATE
 for my $test (@all_env)
 {
     ($instance = $TEMPLATE) =~ s/PATTERN/$test/g;
-    my $value = eval $instance;
 
-    is($value, $ENV{$test}, "Import of $test");
+    is(eval $instance, $ENV{$test}, "Import of $test");
 }
 
 exit;
