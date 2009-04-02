@@ -1,6 +1,6 @@
 Env::Export - Export environment variables as constant subroutines
 
-Version: 0.12
+Version: 0.20
 
 WHAT IS IT
 
@@ -60,8 +60,26 @@ up for all CPAN-based distributions:
 CHANGES
 
 * lib/Env/Export.pm
-* t/15_no_redefine.t (added)
-Check before creating a sub, to avoid clobbering existing subs.
+* t/15_no_redefine.t (deleted)
+* t/20_regex.t (added)
+* t/25_glob.t (added)
+* t/30_prefix.t (added)
+* t/40_all.t (added)
+* t/50_warn.t (added)
+* t/60_override.t (added)
+* t/70_link.t (added)
+* t/80_split.t (added)
+* t/sub_count.pl (added)
+Added extensive new features and loads more tests. Better       
+overall model for how the args list is processed into a series  
+of newly-defined functions. The keywords ":all",                
+":prefix"/":noprefix", ":warn"/":nowarn",                       
+":override"/":nooverride", ":link"/":nolink" and ":split" are   
+now all implemented. Shell-style globbing patterns are          
+acceptable as an alternative to regular expressions.            
+Documentation extensively re-worked to cover all of this, and   
+tests galore for all of these features.                         
 
-* lib/Env/Export.pm
-Fix for RT ticket #44539, typo in the name of a class.
+* t/10_basic.t
+* t/15_no_redefine.t
+Bring tests more in line with nature of the module.             
