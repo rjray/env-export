@@ -5,4 +5,6 @@ blib
 ChangeLog
 MANIFEST
 META.yml
+MYMETA.yml
 Makefile.PL
+README
