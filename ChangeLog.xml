@@ -12,6 +12,14 @@
     A Perl module to facilitate exporting environment values as run-time
     constant subroutines.
   </description>
+  <release version="0.21" sc:tag="0.21" date="2010-04-25T22:10:00-07:00">
+    <change git:commit="64f45f47560b7e0e5227b780e3015577091d0f52">
+      <file path="lib/Env/Export.pm" />
+      <description>
+        Code clean-up inspired by perlcritic.
+      </description>
+    </change>
+  </release>
   <release version="0.20" sc:tag="0.20" date="2009-04-02T03:00:00-07:00">
     <change git:commit="45f3c6a13d7f461a35ac64a6bc2a6aeba4ac51d1">
       <fileset>
