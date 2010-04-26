@@ -23,7 +23,9 @@ use strict;
 use warnings;
 use subs qw(import);
 
-our $VERSION = '0.20';
+use Carp qw(croak carp);
+
+our $VERSION = '0.21';
 
 ###############################################################################
 #
@@ -42,19 +44,27 @@ our $VERSION = '0.20';
 #   Returns:        void
 #
 ###############################################################################
-sub import
+sub import ## no critic(ProhibitExcessComplexity)
 {
     my ($class, @patterns) = @_;
     my $me = "${class}::import";
 
+    ## no critic(ProhibitNoStrict)
+    ## no critic(ProhibitProlongedStrictureOverride)
+    ## no critic(ProhibitNoWarnings)
     no strict 'refs';
     no warnings qw(redefine prototype);
 
-    return unless @patterns; # Nothing to do if they didn't request anything
+    if (! @patterns)
+    {
+        return; # Nothing to do if they didn't request anything
+    }
 
-    my ($calling_pkg) = caller();
-    die("$me: Could not determine caller package")
-        if not defined $calling_pkg or $calling_pkg eq '';
+    my ($calling_pkg) = caller;
+    if ((! defined $calling_pkg) || ($calling_pkg eq q{}))
+    {
+        croak "$me: Could not determine caller package";
+    }
     my $callersym = \%{"${calling_pkg}::"};
 
     # Values that are tweaked by keywords that may appear in the @patterns
@@ -62,32 +72,32 @@ sub import
     my $warn     = 1;
     my $link     = 0;
     my $mutable  = 0;
-    my $prefix   = '';
+    my $prefix   = q{};
     my $override = 0;
-    my $split    = '';
+    my $split    = q{};
 
     # Establish the set of allowable %ENV keys that are eligible for export.
     # This will avoid repeated iterations over %ENV later, and will remove
     # any keys that could not be used to create valid sub names
-    my @choices = grep(/^[A-Za-z_]\w*$/, keys %ENV);
+    my @choices = grep { /^[A-Za-z_]\w*$/ } keys %ENV;
     # This list will accumulate the set of subs to be created, in the form of
     # metadata:
     my @subs = ();
 
-    while (defined(my $pat = shift(@patterns)))
+    while (my $pat = shift @patterns)
     {
         # This would be a lot cleaner if I could assume the presence of the
         # "switch" statement. But I'm not ready to limit this code to 5.10+
 
         # Do the keywords first, in most cases they just flip flags back and
         # forth
-        if ($pat =~ /^:(no)?warn$/)
+        if ($pat =~ /^:(no)?warn$/) ## no critic(ProhibitCascadingIfElse)
         {
             $warn = $1 ? 0 : 1;
         }
         elsif ($pat =~ /^:(no)?prefix$/)
         {
-            $prefix = $1 ? '' : shift(@patterns);
+            $prefix = $1 ? q{} : shift @patterns;
         }
         elsif ($pat =~ /^:(no)?override$/)
         {
@@ -103,19 +113,19 @@ sub import
         }
         elsif ($pat eq ':split')
         {
-            $split = shift(@patterns);
+            $split = shift @patterns;
         }
         elsif ($pat eq ':all')
         {
             for (@choices)
             {
-                push(@subs, { key      => $_,
+                push @subs, { key      => $_,
                               warn     => $warn,
                               prefix   => $prefix,
                               override => $override,
                               link     => $link,
                               mutable  => $mutable,
-                              split    => $split, });
+                              split    => $split, };
             }
         }
         # Now handle explicit names, shell-style patterns and regexen:
@@ -129,54 +139,54 @@ sub import
             $pat = qr/^$pat$/;
 
             # Add an entry to @subs for each matching key
-            for (grep($_ =~ $pat, @choices))
+            for (grep { $_ =~ $pat } @choices)
             {
-                push(@subs, { key      => $_,
+                push @subs, { key      => $_,
                               warn     => $warn,
                               prefix   => $prefix,
                               override => $override,
                               link     => $link,
                               mutable  => $mutable,
-                              split    => $split, });
+                              split    => $split, };
             }
         }
         # Pre-compiled Perl regexen:
         elsif (ref($pat) eq 'Regexp')
         {
             # Add an entry to @subs for each matching key
-            for (grep($_ =~ $pat, @choices))
+            for (grep { $_ =~ $pat } @choices)
             {
-                push(@subs, { key      => $_,
+                push @subs, { key      => $_,
                               warn     => $warn,
                               prefix   => $prefix,
                               override => $override,
                               link     => $link,
                               mutable  => $mutable,
-                              split    => $split, });
+                              split    => $split, };
             }
         }
         # Lastly, acceptable strings:
         elsif ($pat =~ /^[A-Za-z_]\w*$/)
         {
             # Just add a single entry to @subs for the string
-            push(@subs, { key      => $pat,
+            push @subs, { key      => $pat,
                           warn     => $warn,
                           prefix   => $prefix,
                           override => $override,
                           link     => $link,
                           mutable  => $mutable,
-                          split    => $split, });
+                          split    => $split, };
         }
         # And if we got here it was almost certainly a pattern that would not
         # be a valid Perl subname. Note that this is not suppressed by :nowarn.
         else
         {
-            warn "$me: Unrecognized pattern or keyword '$pat', skipped";
+            carp "$me: Unrecognized pattern or keyword '$pat', skipped";
         }
 
         # Since :split is defined to apply to only the next name or pattern,
         # we have to clear it every iteration just to be safe...
-        $split = '';
+        $split = q{};
     }
 
     foreach (@subs)
@@ -190,8 +200,11 @@ sub import
         {
             # We don't overwrite existing subroutines unless they OK'd it
             # with :override
-            warn "$me: Will not redefine ${calling_pkg}::$subname, skipping"
-                if $_->{warn};
+            if ($_->{warn})
+            {
+                carp "$me: Will not redefine ${calling_pkg}::$subname, " .
+                    'skipping';
+            }
             next;
         }
 
@@ -204,28 +217,30 @@ sub import
         {
             if ($_->{split})
             {
-                my $split = $_->{split};
-                *$subname = sub () { split($split, $ENV{$envkey}) };
+                my $localsplit = $_->{split};
+                *{$subname} = sub () { split $localsplit, $ENV{$envkey} };
             }
             else
             {
-                *$subname = sub () { $ENV{$envkey} };
+                *{$subname} = sub () { $ENV{$envkey} };
             }
         }
         else
         {
             if ($_->{split})
             {
-                my @value = split($_->{split}, $ENV{$envkey});
-                *$subname = sub () { @value };
+                my @value = split $_->{split}, $ENV{$envkey};
+                *{$subname} = sub () { @value };
             }
             else
             {
                 my $value = $ENV{$envkey};
-                *$subname = sub () { $value };
+                *{$subname} = sub () { $value };
             }
         }
     }
+
+    return;
 }
 
 1;
@@ -256,6 +271,11 @@ specific environment variables.
 
 Specification of the environment values to export may be by explicit name or
 by regular expression. Any number of names or patterns may be passed in.
+
+=head1 SUBROUTINES/METHODS
+
+The only subroutine/method provided by this package is B<import>, which
+handles the exporting of the requested environment variables.
 
 =head1 EXPORT
 
@@ -382,7 +402,7 @@ potentially be in-lined as constant subroutines. However, this means that a
 change to the environment variable in question (by a third-party library, for
 example) will never be reflected in the function. Specifying C<:link> causes
 all subsequent functions to read the environment value each time, instead.
-This is applied to each function created until C<:nolink> is encounted.
+This is applied to each function created until C<:nolink> is encountered.
 
 In this example:
 
@@ -460,6 +480,11 @@ around redefining existing subroutines, Perl will always issue a warning if
 you redefine an existing I<constant> subroutine. This warning cannot be
 suppressed by the C<no warnings 'redefine'> pragma.
 
+=head1 DIAGNOSTICS
+
+The only fatal condition is when B<import> cannot identify the calling
+package.
+
 =head1 SEE ALSO
 
 L<constant>, L<perlvar/"Constant Functions">
@@ -506,7 +531,7 @@ L<http://github.com/rjray/env-export/tree/master>
 
 =back
 
-=head1 COPYRIGHT & LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 This file and the code within are copyright (c) 2009 by Randy J. Ray.
 
