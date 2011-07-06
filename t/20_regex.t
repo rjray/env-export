@@ -6,8 +6,8 @@ use warnings;
 use File::Spec;
 use Test::More;
 
-(undef, my $dir, undef) = File::Spec->splitpath(File::Spec->rel2abs($0));
-require File::Spec->catfile($dir, 'sub_count.pl');
+(my $vol, my $dir, undef) = File::Spec->splitpath(File::Spec->rel2abs($0));
+require File::Spec->catpath($vol, $dir, 'sub_count.pl');
 
 # TEST SCOPE: These tests exercise the use of pre-compiled regexen in import()
 
