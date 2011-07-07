@@ -10,3 +10,4 @@ Makefile.PL
 README
 MYMETA.json
 cover_db
+.project
