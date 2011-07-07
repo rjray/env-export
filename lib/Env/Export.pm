@@ -212,7 +212,6 @@ sub import ## no critic(ProhibitExcessComplexity)
         {
             if ($_->{split})
             {
-                warn "split+link\n";
                 my $localsplit = $_->{split};
                 *{$subname} = sub () {
                     return split $localsplit, $ENV{$envkey};
@@ -271,10 +270,11 @@ Env::Export - Export %ENV values as constant subroutines
 
 This module exports the requested environment variables from C<%ENV> as
 constants, represented by subroutines that have the same names as the
-specific environment variables.
+specified environment variables.
 
-Specification of the environment values to export may be by explicit name or
-by regular expression. Any number of names or patterns may be passed in.
+Specification of the environment values to export may be by explicit name,
+shell-style glob pattern or by regular expression. Any number of names or
+patterns may be passed in.
 
 =head1 SUBROUTINES/METHODS
 
@@ -284,7 +284,7 @@ handles the exporting of the requested environment variables.
 =head1 EXPORT
 
 Any environment variable whose name would be a valid Perl identifier (must
-match the pattern C<^[A-Za-z_]\w*$> may be exported this way. No values are
+match the pattern C<^[A-Za-z_]\w*$>) may be exported this way. No values are
 exported by default, all must be explicitly requested. If you request a name
 that does not match the above pattern, a warning is issued and the name is
 removed from the exports list.
@@ -311,7 +311,7 @@ list of parameters:
 
 This would convert all the environment variables that start with the
 characters C<LC_> (the locale/language variables used for character sets,
-encoding, etc.)  to subroutines. You wouldn't have to specify each one
+encoding, etc.) to subroutines. You wouldn't have to specify each one
 separately, or go back and add to the list if/when you added more such
 variables.
 
@@ -364,7 +364,7 @@ shorter version enabling it. The last keyword operates in a different way.
 
 Enable or disable warnings sent by B<Env::Export>. By default, warnings are
 enabled. If the user tries to redefine an existing subroutine, a warning is
-triggered. If warnings are disabled, then it will not be. Note that the
+issued. If warnings are disabled, then it will not be. Note that the
 warning that signals an invalid export pattern cannot be suppressed by this
 keyword. (It can by caught by C<$SIG{__WARN__}>, if you like.)
 
@@ -422,7 +422,7 @@ Several common environment variables act as lists of values separated by a
 common delimiter (usually a colon, C<:>). These include "PATH",
 "LD_LIBRARY_PATH", etc. Since users may want to always treat these values as
 arrays, to save you the trouble of always splitting the elements out each
-time you access the value, the C<:split> keyword allows you to specify the
+time you access the value the C<:split> keyword allows you to specify the
 delimiter that should be applied. The function that gets created will then
 return an array rather than a single element (although the array may have only
 one element, of course). The delimiter may be a constant string or a
@@ -486,8 +486,7 @@ suppressed by the C<no warnings 'redefine'> pragma.
 
 =head1 DIAGNOSTICS
 
-The only fatal condition is when B<import> cannot identify the calling
-package.
+B<Env::Export> only issues warnings, and should not throw any exceptions.
 
 =head1 SEE ALSO
 
@@ -495,11 +494,11 @@ L<constant|constant>, L<perlvar/"Constant Functions">
 
 =head1 AUTHOR
 
-Randy J. Ray C<< <rjray@blackperl.com> >>
+Randy J. Ray C<< <rjray at blackperl.com> >>
 
 Original idea from a journal posting by Curtis "Ovid" Poe
 (C<< <ovid at cpan.org> >>), built on a sample implementation done by
-Steffen Mueller, C<< <smueller@cpan.org> >>.
+Steffen Mueller, C<< <smueller at cpan.org> >>.
 
 =head1 BUGS
 
