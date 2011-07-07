@@ -41,7 +41,7 @@ my $builder = $class->new(
     dist_author        => 'Randy J. Ray <rjray@blackperl.com>',
     dist_abstract      =>
     'Automatically export environment variables as constant-subs',
-    dist_version       => '0.21',
+    dist_version       => '0.22',
     build_requires     =>
     {
         'File::Spec'    => '3.0',
@@ -52,13 +52,9 @@ my $builder = $class->new(
     {
         'perl' => '5.006001',
     },
-    recommends         =>
-    {
-        'Test::Pod'           => '0',
-        'Test::Pod::Coverage' => '0',
-    },
     add_to_cleanup     => [ qw(Env-Export-*
                                ChangeLog
+                               README
                                MANIFEST
                                MANIFEST.bak
                                META.yml
@@ -69,7 +65,7 @@ my $builder = $class->new(
         {
             homepage   => 'http://search.cpan.org/dist/Env-Export',
             bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=Env-Export',
-            repository => 'http://github.com/rjray/env-export/tree/master',
+            repository => 'https://github.com/rjray/env-export',
         }
     },
 

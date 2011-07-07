@@ -12,6 +12,53 @@
     A Perl module to facilitate exporting environment values as run-time
     constant subroutines.
   </description>
+  <release version="0.22" sc:tag="0.22" date="2011-07-07T01:00:00-07:00">
+    <change git:commit="50002b4e37a4b6d8eef6803657329f41d3a5723c">
+      <fileset>
+        <file path="t/00_load.t" action="DELETE" />
+        <file path="t/01_pod.t" action="DELETE" />
+        <file path="t/02_pod_coverage.t" action="DELETE" />
+        <file path="xt/00_load.t" />
+        <file path="xt/01_pod.t" />
+        <file path="xt/02_pod_coverage.t" />
+      </fileset>
+      <description>
+        Move author-only tests to the xt/ directory.
+      </description>
+    </change>
+    <change git:commit="e0c207e5d25388694e5d602eca27a9faff8ff3aa">
+      <fileset>
+        <file path="t/20_regex.t" />
+        <file path="t/25_glob.t" />
+        <file path="t/40_all.t" />
+      </fileset>
+      <description>
+        Consider volume when creating path to sub_count.pl.
+      </description>
+    </change>
+    <change git:commit="80dbe93eaa7b48ab2c09d42deb3e9e4c4588cd51">
+      <fileset>
+        <file path="t/10_basic.t" />
+        <file path="t/80_split.t" />
+      </fileset>
+      <description>
+        Additions to increase code-coverage of tests.
+      </description>
+    </change>
+    <change git:commit="2130fbb24b48a95a46891c042b90708e1fe7ce77">
+      <file path="lib/Env/Export.pm" />
+      <description>
+        Bug fixes, critic clean-up and some docs clean-up.
+        Some fixes related to getting better code-coverage in test suites.
+      </description>
+    </change>
+    <change git:commit="51c06ab12c3ff0b5e0d4f2f253f512a186192dcd">
+      <file path="lib/Env/Export.pm" />
+      <description>
+        Removed a left-over debugging line, doc fixes.
+      </description>
+    </change>
+  </release>
   <release version="0.21" sc:tag="0.21" date="2010-04-25T22:10:00-07:00">
     <change git:commit="64f45f47560b7e0e5227b780e3015577091d0f52">
       <file path="lib/Env/Export.pm" />
