@@ -8,3 +8,5 @@ _build
 ^Build$
 .git
 ^MYMETA.yml$
+^MYMETA.json$
+^.project$
