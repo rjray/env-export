@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# This file copyright (c) 2009 by Randy J. Ray, all rights reserved
+# This file copyright (c) 2009-2011 by Randy J. Ray, all rights reserved
 #
 # Copying and distribution are permitted under the terms of the Artistic
 # License 2.0 (http://www.opensource.org/licenses/artistic-license-2.0.php) or
@@ -21,11 +21,13 @@ package Env::Export;
 use 5.006001;
 use strict;
 use warnings;
+use vars qw($VERSION);
 use subs qw(import);
 
 use Carp qw(croak carp);
 
-our $VERSION = '0.21';
+$VERSION = '0.22';
+$VERSION = eval $VERSION; ## no critic(ProhibitStringyEval)
 
 ###############################################################################
 #
@@ -61,17 +63,12 @@ sub import ## no critic(ProhibitExcessComplexity)
     }
 
     my ($calling_pkg) = caller;
-    if ((! defined $calling_pkg) || ($calling_pkg eq q{}))
-    {
-        croak "$me: Could not determine caller package";
-    }
     my $callersym = \%{"${calling_pkg}::"};
 
     # Values that are tweaked by keywords that may appear in the @patterns
     # stream:
     my $warn     = 1;
     my $link     = 0;
-    my $mutable  = 0;
     my $prefix   = q{};
     my $override = 0;
     my $split    = q{};
@@ -88,6 +85,16 @@ sub import ## no critic(ProhibitExcessComplexity)
     {
         # This would be a lot cleaner if I could assume the presence of the
         # "switch" statement. But I'm not ready to limit this code to 5.10+
+
+        # Because ":split" only applies to the very next argument after it,
+        # we have to handle it specially. It gets cleared at the end of every
+        # iteration of this loop, so if it is here, peel off the next argument
+        # then re-assign $pat to the one after that.
+        if ($pat eq ':split')
+        {
+            $split = shift @patterns;
+            $pat   = shift @patterns;
+        }
 
         # Do the keywords first, in most cases they just flip flags back and
         # forth
@@ -107,14 +114,6 @@ sub import ## no critic(ProhibitExcessComplexity)
         {
             $link = $1 ? 0 : 1;
         }
-        elsif ($pat =~ /^:(no)?mutable$/)
-        {
-            $mutable = $1 ? 0 : 1;
-        }
-        elsif ($pat eq ':split')
-        {
-            $split = shift @patterns;
-        }
         elsif ($pat eq ':all')
         {
             for (@choices)
@@ -124,32 +123,10 @@ sub import ## no critic(ProhibitExcessComplexity)
                               prefix   => $prefix,
                               override => $override,
                               link     => $link,
-                              mutable  => $mutable,
                               split    => $split, };
             }
         }
         # Now handle explicit names, shell-style patterns and regexen:
-        # First, shell style (* => .*, ? => ., ?* => .+):
-        elsif ($pat =~ /^[A-Za-z_\*\?][\w\*\?]*$/)
-        {
-            # Change the shell-style globbing patterns to regex equivalents
-            $pat =~ s/\?\*/.+/g;
-            $pat =~ s/\*/.*/g;
-            $pat =~ s/\?/./g;
-            $pat = qr/^$pat$/;
-
-            # Add an entry to @subs for each matching key
-            for (grep { $_ =~ $pat } @choices)
-            {
-                push @subs, { key      => $_,
-                              warn     => $warn,
-                              prefix   => $prefix,
-                              override => $override,
-                              link     => $link,
-                              mutable  => $mutable,
-                              split    => $split, };
-            }
-        }
         # Pre-compiled Perl regexen:
         elsif (ref($pat) eq 'Regexp')
         {
@@ -161,7 +138,26 @@ sub import ## no critic(ProhibitExcessComplexity)
                               prefix   => $prefix,
                               override => $override,
                               link     => $link,
-                              mutable  => $mutable,
+                              split    => $split, };
+            }
+        }
+        # Shell style (* => .*, ? => ., ?* => .+):
+        elsif ($pat =~ /[*?]/)
+        {
+            # Change the shell-style globbing patterns to regex equivalents
+            $pat =~ s/[?][*]/.+/g;
+            $pat =~ s/[*]/.*/g;
+            $pat =~ s/[?]/./g;
+            $pat = qr/^$pat$/;
+
+            # Add an entry to @subs for each matching key
+            for (grep { $_ =~ $pat } @choices)
+            {
+                push @subs, { key      => $_,
+                              warn     => $warn,
+                              prefix   => $prefix,
+                              override => $override,
+                              link     => $link,
                               split    => $split, };
             }
         }
@@ -174,7 +170,6 @@ sub import ## no critic(ProhibitExcessComplexity)
                           prefix   => $prefix,
                           override => $override,
                           link     => $link,
-                          mutable  => $mutable,
                           split    => $split, };
         }
         # And if we got here it was almost certainly a pattern that would not
@@ -217,12 +212,17 @@ sub import ## no critic(ProhibitExcessComplexity)
         {
             if ($_->{split})
             {
+                warn "split+link\n";
                 my $localsplit = $_->{split};
-                *{$subname} = sub () { split $localsplit, $ENV{$envkey} };
+                *{$subname} = sub () {
+                    return split $localsplit, $ENV{$envkey};
+                };
             }
             else
             {
-                *{$subname} = sub () { $ENV{$envkey} };
+                *{$subname} = sub () {
+                    return $ENV{$envkey};
+                };
             }
         }
         else
@@ -230,12 +230,16 @@ sub import ## no critic(ProhibitExcessComplexity)
             if ($_->{split})
             {
                 my @value = split $_->{split}, $ENV{$envkey};
-                *{$subname} = sub () { @value };
+                *{$subname} = sub () {
+                    return @value;
+                };
             }
             else
             {
                 my $value = $ENV{$envkey};
-                *{$subname} = sub () { $value };
+                *{$subname} = sub () {
+                    return $value;
+                };
             }
         }
     }
@@ -487,7 +491,7 @@ package.
 
 =head1 SEE ALSO
 
-L<constant>, L<perlvar/"Constant Functions">
+L<constant|constant>, L<perlvar/"Constant Functions">
 
 =head1 AUTHOR
 
@@ -527,13 +531,13 @@ L<http://search.cpan.org/dist/Env-Export>
 
 =item * Source code on GitHub
 
-L<http://github.com/rjray/env-export/tree/master>
+L<https://github.com/rjray/env-export>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-This file and the code within are copyright (c) 2009 by Randy J. Ray.
+This file and the code within are copyright (c) 2009-2011 by Randy J. Ray.
 
 Copying and distribution are permitted under the terms of the Artistic
 License 2.0 (L<http://www.opensource.org/licenses/artistic-license-2.0.php>) or
