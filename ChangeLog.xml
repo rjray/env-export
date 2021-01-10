@@ -18,9 +18,9 @@
         <file path="t/00_load.t" action="DELETE" />
         <file path="t/01_pod.t" action="DELETE" />
         <file path="t/02_pod_coverage.t" action="DELETE" />
-        <file path="xt/00_load.t" />
-        <file path="xt/01_pod.t" />
-        <file path="xt/02_pod_coverage.t" />
+        <file path="xt/00_load.t" action="ADD" />
+        <file path="xt/01_pod.t" action="ADD" />
+        <file path="xt/02_pod_coverage.t" action="ADD" />
       </fileset>
       <description>
         Move author-only tests to the xt/ directory.
